@@ -1,2 +1,2 @@
 # GoLang_Solutions
-Solutions for GoLAng language
+Solutions for GoLаng language
