@@ -18,7 +18,7 @@ type Graph struct {
 
 func main() {
 
-	file, err := os.Open("graf.json") // Укажите имя вашего JSON-файла
+	file, err := os.Open("graf.json")
 	if err != nil {
 		fmt.Println("Ошибка при открытии файла:", err)
 		return
@@ -34,7 +34,7 @@ func main() {
 
 	graph := jsonData["graph"]
 
-	// Указываем начальный и конечный узлы для поиска пути
+
 	var startNode int
 	var endNode int
  fmt.print('Введите начальную ноду')
