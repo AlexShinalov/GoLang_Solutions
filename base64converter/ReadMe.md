@@ -6,9 +6,10 @@ go build base64converter.go
 ```
 ## Hoe to use without build:
 ```bash
-.\base64converter.exe encode -i "\hello.txt" -o "\hello64.txt"
+ go run base64converter.go encode -i "\hello.txt" -o "\hello64.txt"
 ```
 
 
 ## Suggestions 
 Enter full path for input and output files 
+
