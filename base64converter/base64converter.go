@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -15,13 +17,11 @@ func encodeFile(inputPath, outputPath string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	byted := []byte(inputData)
 	hash := sha256.Sum256(byted)
 	str := hex.EncodeToString(hash[:])
 	fmt.Println(str)
-	encodedData := base64.StdEncoding.EncodeToString(inputData)
-
 	encodedData := base64.StdEncoding.EncodeToString(inputData)
 
 	if outputPath == "" {
@@ -31,22 +31,22 @@ func encodeFile(inputPath, outputPath string) error {
 	return ioutil.WriteFile(outputPath, []byte(encodedData), 0644)
 }
 
-func decodeFile(inputPath, outputPath string) error {
+func decodeFile(inputPath, outputPath string) (error, string) {
 	inputData, err := ioutil.ReadFile(inputPath)
 	if err != nil {
-		return err
+		return err, ""
 	}
 
 	decodedData, err := base64.StdEncoding.DecodeString(string(inputData))
 	if err != nil {
-		return err
+		return err, ""
 	}
 
 	byted := []byte(decodedData)
 	hash := sha256.Sum256(byted)
 	str := hex.EncodeToString(hash[:])
 	fmt.Println(str)
-	
+
 	if outputPath == "" {
 		ext := filepath.Ext(inputPath)
 		outputPath = strings.TrimSuffix(inputPath, ext)
@@ -56,11 +56,11 @@ func decodeFile(inputPath, outputPath string) error {
 		outputPath += "-decoded" + ext
 	}
 
-	return ioutil.WriteFile(outputPath, []byte(decodedData), 0644)
+	return ioutil.WriteFile(outputPath, []byte(decodedData), 0644), str
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) < 3 {
 		fmt.Println("Usage: encoder64 <command> [options]")
 		fmt.Println("Commands: encode, decode")
 		fmt.Println("Please, enter full path to the source files")
@@ -102,16 +102,19 @@ func main() {
 		decodeCmd := flag.NewFlagSet("decode", flag.ExitOnError)
 		inputFlag := decodeCmd.String("i", "", "Input file")
 		outputFlag := decodeCmd.String("o", "", "Output file")
+		hashFlag := decodeCmd.String("h", "", "Hash")
 		decodeCmd.Parse(os.Args[2:])
 
 		inputPath := *inputFlag
 		outputPath := *outputFlag
+		yourHash := *hashFlag
 
 		if inputPath == "" {
 			inputPath = os.Args[2]
 		}
 
 		if outputPath == "" {
+
 			ext := filepath.Ext(inputPath)
 			outputPath = strings.TrimSuffix(inputPath, ext)
 			if ext == "" {
@@ -120,7 +123,18 @@ func main() {
 			outputPath += ".out"
 		}
 
-		err := decodeFile(inputPath, outputPath)
+		err, hash_d := decodeFile(inputPath, outputPath)
+
+		if yourHash == "" {
+			yourHash = os.Args[3]
+			fmt.Println(yourHash)
+			fmt.Println(hash_d)
+		}
+
+		if yourHash == hash_d {
+			fmt.Println("Hashes matched")
+		}
+
 		if err != nil {
 			fmt.Println("Error decoding file:", err)
 			os.Exit(1)
