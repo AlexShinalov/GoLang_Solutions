@@ -15,6 +15,12 @@ func encodeFile(inputPath, outputPath string) error {
 	if err != nil {
 		return err
 	}
+	
+	byted := []byte(inputData)
+	hash := sha256.Sum256(byted)
+	str := hex.EncodeToString(hash[:])
+	fmt.Println(str)
+	encodedData := base64.StdEncoding.EncodeToString(inputData)
 
 	encodedData := base64.StdEncoding.EncodeToString(inputData)
 
@@ -36,6 +42,11 @@ func decodeFile(inputPath, outputPath string) error {
 		return err
 	}
 
+	byted := []byte(decodedData)
+	hash := sha256.Sum256(byted)
+	str := hex.EncodeToString(hash[:])
+	fmt.Println(str)
+	
 	if outputPath == "" {
 		ext := filepath.Ext(inputPath)
 		outputPath = strings.TrimSuffix(inputPath, ext)
